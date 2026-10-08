@@ -1,30 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>YCBGJS · 平面笔记</title>
+    <title>YCBGJS</title>
     <link>https://ycbgjs.github.io/</link>
-    <description>把想法摊平，写在纸面上。</description>
-    <language>zh-Hans</language>
-    <item>
-      <title>少一层阴影</title>
-      <link>https://ycbgjs.github.io/posts/less-shadow.html</link>
-      <guid>https://ycbgjs.github.io/posts/less-shadow.html</guid>
-      <pubDate>Wed, 07 Oct 2026 00:00:00 +0800</pubDate>
-      <description>平面不是贫乏，是把注意力还给文字和结构。</description>
-    </item>
-    <item>
-      <title>把句子写短</title>
-      <link>https://ycbgjs.github.io/posts/short-sentences.html</link>
-      <guid>https://ycbgjs.github.io/posts/short-sentences.html</guid>
-      <pubDate>Fri, 18 Sep 2026 00:00:00 +0800</pubDate>
-      <description>短句迫使你选择。写不完的，留到下一篇。</description>
-    </item>
-    <item>
-      <title>桌上只留一件事</title>
-      <link>https://ycbgjs.github.io/posts/one-thing.html</link>
-      <guid>https://ycbgjs.github.io/posts/one-thing.html</guid>
-      <pubDate>Sun, 02 Aug 2026 00:00:00 +0800</pubDate>
-      <description>少一个第二选择，阅读就会变成一条直路。</description>
-    </item>
+    <description>YCBGJS</description>
+    <language>en</language>
+    <!-- posts:start -->
+    <!-- posts:end -->
   </channel>
 </rss>

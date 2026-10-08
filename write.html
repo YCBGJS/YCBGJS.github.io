@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Write · YCBGJS</title>
+  <meta name="description" content="Write a post in Markdown and publish it to the YCBGJS blog.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f3f1ec">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/vendor/vditor/dist/index.css">
+</head>
+<body class="write-page">
+  <a class="skip" href="#vditor">Skip to content</a>
+  <header class="write-bar">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>YCBGJS</a>
+    <label class="field write-title">
+      <input id="title" type="text" maxlength="80" placeholder="Title" autocomplete="off">
+    </label>
+    <label class="field compact">
+      <select id="category" aria-label="Category">
+        <option>Design</option>
+        <option>Writing</option>
+        <option>Daily</option>
+        <option>Other</option>
+      </select>
+    </label>
+    <label class="field compact">
+      <input id="date" type="date" aria-label="Date">
+    </label>
+    <label class="field compact write-slug">
+      <input id="slug" type="text" maxlength="60" spellcheck="false" placeholder="Filename" autocomplete="off" aria-label="Filename">
+    </label>
+    <button class="action" id="publish" type="button">Publish</button>
+    <button class="ghost" id="toggle-settings" type="button" aria-expanded="false" aria-controls="settings-panel">Token</button>
+    <p class="status write-status" id="status" role="status"></p>
+  </header>
+
+  <section class="write-settings" id="settings-panel" hidden>
+    <div>
+      <p>Use a fine-grained token that can only write to this repository. <a href="https://github.com/settings/personal-access-tokens/new">Create a token</a>, choose YCBGJS/YCBGJS.github.io, and set Contents to Read and write. The token stays in this browser.</p>
+      <label class="field">
+        <span>Token</span>
+        <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+      </label>
+      <div class="editor-actions">
+        <button class="ghost" id="save-token" type="button">Save token</button>
+        <button class="ghost" id="clear-token" type="button">Clear</button>
+      </div>
+      <p class="hint" id="token-state"></p>
+    </div>
+    <div>
+      <label class="field" id="custom-wrap" hidden>
+        <span>Custom category</span>
+        <input id="category-custom" type="text" maxlength="12" placeholder="Notes">
+      </label>
+      <label class="field">
+        <span>Excerpt</span>
+        <input id="excerpt" type="text" maxlength="80" placeholder="Leave empty to use the first sentence">
+      </label>
+      <p class="hint" id="slug-hint"></p>
+    </div>
+  </section>
+
+  <main class="write-workspace">
+    <div id="vditor"></div>
+  </main>
+  <script src="/vendor/vditor/dist/index.min.js"></script>
+  <script type="module" src="/js/editor.js"></script>
+</body>
+</html>

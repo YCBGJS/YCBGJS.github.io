@@ -1,78 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>YCBGJS · 平面笔记</title>
-  <meta name="description" content="YCBGJS 的个人博客。简约平面风格，记录设计、写作与日常。">
-  <meta name="theme-color" content="#f3f1ec">
-  <meta property="og:title" content="YCBGJS · 平面笔记">
-  <meta property="og:description" content="把想法摊平，写在纸面上。">
-  <meta property="og:type" content="website">
+  <title>YCBGJS</title>
+  <meta name="description" content="YCBGJS">
+  <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="alternate" type="application/rss+xml" title="YCBGJS" href="/feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Bungee+Shade&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function () {
+      var stored = localStorage.getItem("theme");
+      var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var theme = stored && stored !== "system" ? stored : (dark ? "dark" : "light");
+      if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+    })();
+  </script>
 </head>
 <body>
-  <a class="skip" href="#main">跳到正文</a>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>YCBGJS</a>
-      <nav class="nav" aria-label="主导航">
-        <a href="/" aria-current="page">首页</a>
-        <a href="/archive.html">归档</a>
-        <a href="/about.html">关于</a>
-      </nav>
+  <a class="skip" href="#posts-list">Skip to content</a>
+  <article class="posts">
+    <header>
+      <h1 class="header-title"><a href="/">YCBGJS</a></h1>
+    </header>
+    <div class="row end-md header-items">
+      <div class="header-item-left">
+        <button id="theme-toggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Toggle color theme">🌙</button>
+      </div>
+      <div class="header-item"><a href="/about.html">About</a></div>
+      <div class="header-item"><a href="https://github.com/YCBGJS" target="_blank" rel="noopener">GitHub</a></div>
     </div>
-  </header>
-  <main id="main">
-    <div class="wrap">
-      <p class="kicker">个人博客</p>
-      <h1>把想法摊平，<br>写在<span class="hl">纸面</span>上。</h1>
-      <p class="lede">这里记录设计、写作，以及日常里值得留下的句子。版面保持平整：颜色是实的，边是直的，没有阴影。</p>
-
-      <h2 class="section-label">最近</h2>
-      <ul class="post-list">
-        <li>
-          <a class="post-card" href="/posts/less-shadow.html">
-            <div class="post-meta">
-              <time datetime="2026-10-07">2026.10.07</time>
-              <span class="chip">设计</span>
-            </div>
-            <h3>少一层阴影</h3>
-            <p>平面不是贫乏，是把注意力还给文字和结构。</p>
-          </a>
-        </li>
-        <li>
-          <a class="post-card" href="/posts/short-sentences.html">
-            <div class="post-meta">
-              <time datetime="2026-09-18">2026.09.18</time>
-              <span class="chip chip-mint">写作</span>
-            </div>
-            <h3>把句子写短</h3>
-            <p>短句迫使你选择。写不完的，留到下一篇。</p>
-          </a>
-        </li>
-        <li>
-          <a class="post-card" href="/posts/one-thing.html">
-            <div class="post-meta">
-              <time datetime="2026-08-02">2026.08.02</time>
-              <span class="chip chip-lilac">日常</span>
-            </div>
-            <h3>桌上只留一件事</h3>
-            <p>少一个第二选择，阅读就会变成一条直路。</p>
-          </a>
-        </li>
-      </ul>
+    <div class="header-line"></div>
+    <div id="posts-list">
+      <!-- posts:start -->
+      <!-- posts:end -->
     </div>
-  </main>
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>© 2026 YCBGJS</p>
-    </div>
-  </footer>
+    <div class="site-footer"></div>
+  </article>
+  <script src="/js/theme.js"></script>
 </body>
 </html>

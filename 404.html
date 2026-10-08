@@ -1,39 +1,41 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>找不到页面 · YCBGJS</title>
-  <meta name="theme-color" content="#f3f1ec">
+  <title>404 · YCBGJS</title>
+  <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Bungee+Shade&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function () {
+      var stored = localStorage.getItem("theme");
+      var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var theme = stored && stored !== "system" ? stored : (dark ? "dark" : "light");
+      if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+    })();
+  </script>
 </head>
 <body>
-  <a class="skip" href="#main">跳到正文</a>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>YCBGJS</a>
-      <nav class="nav" aria-label="主导航">
-        <a href="/">首页</a>
-        <a href="/archive.html">归档</a>
-        <a href="/about.html">关于</a>
-      </nav>
+  <article class="posts">
+    <header>
+      <div class="header-title"><a href="/">YCBGJS</a></div>
+    </header>
+    <div class="row end-md header-items">
+      <div class="header-item-left">
+        <button id="theme-toggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Toggle color theme">🌙</button>
+      </div>
+      <div class="header-item"><a href="/about.html">About</a></div>
+      <div class="header-item"><a href="https://github.com/YCBGJS" target="_blank" rel="noopener">GitHub</a></div>
     </div>
-  </header>
-  <main id="main">
-    <div class="wrap empty">
-      <p class="kicker">404</p>
-      <h1>这页是空的</h1>
-      <p class="lede">地址可能写错了，或者文章已经挪走。回到<a href="/">首页</a>继续看。</p>
-    </div>
-  </main>
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>© 2026 YCBGJS</p>
-    </div>
-  </footer>
+    <div class="header-line"></div>
+    <h1 class="taxonomy-term">404</h1>
+    <p>This page doesn't exist. Go back to the <a href="/">home page</a>.</p>
+    <div class="site-footer"></div>
+  </article>
+  <script src="/js/theme.js"></script>
 </body>
 </html>

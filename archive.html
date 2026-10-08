@@ -1,59 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>归档 · YCBGJS</title>
-  <meta name="description" content="YCBGJS 博客的全部文章。">
-  <meta name="theme-color" content="#f3f1ec">
+  <title>Archive · YCBGJS</title>
+  <meta name="description" content="All posts by YCBGJS">
+  <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="alternate" type="application/rss+xml" title="YCBGJS" href="/feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Bungee+Shade&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function () {
+      var stored = localStorage.getItem("theme");
+      var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var theme = stored && stored !== "system" ? stored : (dark ? "dark" : "light");
+      if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+    })();
+  </script>
 </head>
 <body>
-  <a class="skip" href="#main">跳到正文</a>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>YCBGJS</a>
-      <nav class="nav" aria-label="主导航">
-        <a href="/">首页</a>
-        <a href="/archive.html" aria-current="page">归档</a>
-        <a href="/about.html">关于</a>
-      </nav>
+  <a class="skip" href="#posts-list">Skip to content</a>
+  <article class="posts">
+    <header>
+      <div class="header-title"><a href="/">YCBGJS</a></div>
+    </header>
+    <div class="row end-md header-items">
+      <div class="header-item-left">
+        <button id="theme-toggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Toggle color theme">🌙</button>
+      </div>
+      <div class="header-item"><a href="/about.html">About</a></div>
+      <div class="header-item"><a href="https://github.com/YCBGJS" target="_blank" rel="noopener">GitHub</a></div>
     </div>
-  </header>
-  <main id="main">
-    <div class="wrap">
-      <p class="kicker">归档</p>
-      <h1>全部文章</h1>
-      <p class="lede">按时间倒序。现在有 3 篇。</p>
-      <h2 class="year">2026</h2>
-      <ul class="archive-list">
-        <li>
-          <time datetime="2026-10-07">10.07</time>
-          <a href="/posts/less-shadow.html">少一层阴影</a>
-          <span class="chip">设计</span>
-        </li>
-        <li>
-          <time datetime="2026-09-18">09.18</time>
-          <a href="/posts/short-sentences.html">把句子写短</a>
-          <span class="chip chip-mint">写作</span>
-        </li>
-        <li>
-          <time datetime="2026-08-02">08.02</time>
-          <a href="/posts/one-thing.html">桌上只留一件事</a>
-          <span class="chip chip-lilac">日常</span>
-        </li>
-      </ul>
+    <div class="header-line"></div>
+    <div id="posts-list">
+      <!-- posts:start -->
+      <!-- posts:end -->
     </div>
-  </main>
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>© 2026 YCBGJS</p>
-    </div>
-  </footer>
+    <div class="site-footer"></div>
+  </article>
+  <script src="/js/theme.js"></script>
 </body>
 </html>
