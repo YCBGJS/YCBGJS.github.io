@@ -256,6 +256,19 @@ article {
   font-size: 100%;
 }
 
+.markdown-body pre.mermaid {
+  padding: 0;
+  overflow-x: auto;
+  background: transparent;
+}
+
+.markdown-body pre.mermaid svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 .markdown-body img {
   display: block;
   max-width: 100%;

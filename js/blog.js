@@ -243,6 +243,7 @@ ${renderPager(newer, older)}
     <div class="site-footer"></div>
   </article>
   <script src="/js/theme.js"></script>
+  <script src="/js/post.js"></script>
 </body>
 </html>
 `;

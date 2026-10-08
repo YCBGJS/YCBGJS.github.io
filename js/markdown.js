@@ -43,6 +43,12 @@ function renderInline(raw) {
   return html;
 }
 
+const MERMAID_START = /^(?:flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|mindmap|timeline|gitGraph|C4Context|sankey-beta|xychart-beta|block-beta|quadrantChart|requirementDiagram|kanban|architecture-beta)\b/;
+
+function isMermaidSource(source) {
+  return MERMAID_START.test(String(source).trim());
+}
+
 function isBlockStart(line) {
   return (
     line.startsWith("```") ||
@@ -67,6 +73,7 @@ export function renderMarkdown(source) {
     }
 
     if (line.startsWith("```")) {
+      const lang = line.slice(3).trim().split(/\s+/)[0].toLowerCase();
       const code = [];
       index += 1;
       while (index < lines.length && !lines[index].startsWith("```")) {
@@ -74,7 +81,15 @@ export function renderMarkdown(source) {
         index += 1;
       }
       if (index < lines.length) index += 1;
-      blocks.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
+      const body = escapeHtml(code.join("\n"));
+      const mermaid = lang === "mermaid" || isMermaidSource(code.join("\n"));
+      if (mermaid) {
+        blocks.push(`<pre class="mermaid"><code>${body}</code></pre>`);
+      } else if (/^[a-z0-9-]+$/.test(lang)) {
+        blocks.push(`<pre><code class="language-${lang}">${body}</code></pre>`);
+      } else {
+        blocks.push(`<pre><code>${body}</code></pre>`);
+      }
       continue;
     }
 
