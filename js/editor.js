@@ -1,9 +1,8 @@
 import { excerptFromMarkdown, validateDraft } from "./blog.js";
-import { publishPost } from "./github.js";
+import { deletePost, listPosts, publishPost } from "./github.js";
 
 const TOKEN_KEY = "ycbgjs.githubToken";
 const DRAFT_KEY = "ycbgjs.draft";
-const SPLIT_KEY = "ycbgjs.splitRatio";
 const VDITOR_CDN = "/vendor/vditor";
 const MIN_PANE = 180;
 
@@ -12,21 +11,24 @@ const tokenState = document.querySelector("#token-state");
 const settingsPanel = document.querySelector("#settings-panel");
 const settingsToggle = document.querySelector("#toggle-settings");
 const titleInput = document.querySelector("#title");
-const categoryInput = document.querySelector("#category");
-const customCategory = document.querySelector("#category-custom");
-const customWrap = document.querySelector("#custom-wrap");
+const tagsInput = document.querySelector("#tags");
 const dateInput = document.querySelector("#date");
 const slugInput = document.querySelector("#slug");
 const slugHint = document.querySelector("#slug-hint");
 const excerptInput = document.querySelector("#excerpt");
 const statusNode = document.querySelector("#status");
 const publishButton = document.querySelector("#publish");
+const postsPanel = document.querySelector("#posts-panel");
+const postsToggle = document.querySelector("#toggle-posts");
+const postAdmin = document.querySelector("#post-admin");
 const workspace = document.querySelector(".write-workspace");
 
 let vditor = null;
 let editorReady = false;
+let working = false;
 let initialMarkdown = "";
 let applySplit = () => {};
+let splitRatioValue = 0.5;
 
 function today() {
   const now = new Date();
@@ -44,16 +46,6 @@ function setStatus(message, isError) {
   statusNode.classList.toggle("error", Boolean(isError));
 }
 
-function currentCategory() {
-  if (categoryInput.value === "Other") return customCategory.value.trim();
-  return categoryInput.value;
-}
-
-function syncCategoryField() {
-  const custom = categoryInput.value === "Other";
-  customWrap.hidden = !custom;
-}
-
 function markdownValue() {
   if (editorReady && vditor) return vditor.getValue();
   return initialMarkdown;
@@ -62,7 +54,7 @@ function markdownValue() {
 function currentDraft() {
   return {
     title: titleInput.value,
-    category: currentCategory(),
+    tags: tagsInput.value,
     date: dateInput.value,
     slug: slugInput.value.trim(),
     excerpt: excerptInput.value,
@@ -89,12 +81,9 @@ function loadDraft() {
     if (draft.slug) slugInput.value = draft.slug;
     if (draft.excerpt) excerptInput.value = draft.excerpt;
     if (typeof draft.markdown === "string") initialMarkdown = draft.markdown;
-    if (draft.category === "Design" || draft.category === "Writing" || draft.category === "Daily") {
-      categoryInput.value = draft.category;
-    } else if (draft.category) {
-      categoryInput.value = "Other";
-      customCategory.value = draft.category;
-    }
+    if (Array.isArray(draft.tags)) tagsInput.value = draft.tags.join(", ");
+    else if (draft.tags) tagsInput.value = draft.tags;
+    else if (draft.category) tagsInput.value = draft.category;
   } catch {
     localStorage.removeItem(DRAFT_KEY);
   }
@@ -103,7 +92,86 @@ function loadDraft() {
 function setSettingsOpen(open) {
   settingsPanel.hidden = !open;
   settingsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  if (open) setPostsOpen(false);
   requestAnimationFrame(resizeEditor);
+}
+
+function setPostsOpen(open) {
+  postsPanel.hidden = !open;
+  postsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function setWorking(value) {
+  working = value;
+  publishButton.disabled = value || !editorReady;
+  postsToggle.disabled = value;
+  postAdmin.querySelectorAll("button").forEach((button) => {
+    button.disabled = value;
+  });
+}
+
+function renderPostList(posts) {
+  postAdmin.replaceChildren();
+  if (!posts.length) {
+    const empty = document.createElement("li");
+    empty.textContent = "No posts yet.";
+    postAdmin.append(empty);
+    return;
+  }
+  for (const post of posts) {
+    const item = document.createElement("li");
+    const label = document.createElement("span");
+    label.textContent = `${post.date}  ${post.title}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ghost danger";
+    button.textContent = "Delete";
+    button.addEventListener("click", () => removePost(post));
+    item.append(label, button);
+    postAdmin.append(item);
+  }
+}
+
+async function loadPostList(options = {}) {
+  const loading = document.createElement("li");
+  loading.textContent = "Loading…";
+  postAdmin.replaceChildren(loading);
+  try {
+    const posts = await listPosts(tokenInput.value.trim() || savedToken());
+    renderPostList(posts);
+  } catch (error) {
+    const message = error.message || "Could not load posts";
+    const failed = document.createElement("li");
+    failed.textContent = message;
+    postAdmin.replaceChildren(failed);
+    if (!options.keepStatus) setStatus(message, true);
+  }
+}
+
+async function removePost(post) {
+  if (working) return;
+  const confirmed = window.confirm(`Delete "${post.title}"? This removes it from the site.`);
+  if (!confirmed) return;
+  const token = tokenInput.value.trim() || savedToken();
+  if (!token) {
+    setSettingsOpen(true);
+    setStatus("Add a GitHub token first", true);
+    return;
+  }
+  if (tokenInput.value.trim()) localStorage.setItem(TOKEN_KEY, tokenInput.value.trim());
+  setWorking(true);
+  setStatus("", false);
+  try {
+    await deletePost(token, post.slug, setStatus);
+    tokenInput.value = "";
+    refreshTokenState();
+    setStatus(`Deleted. /posts/${post.slug}.html should disappear in a minute or two`, false);
+    await loadPostList({ keepStatus: true });
+  } catch (error) {
+    setStatus(error.message || "Delete failed", true);
+  } finally {
+    setWorking(false);
+  }
 }
 
 function refreshTokenState() {
@@ -128,12 +196,6 @@ function resizeEditor() {
   if (root) root.style.height = `${height}px`;
   if (shell) shell.style.height = `${height}px`;
   applySplit();
-}
-
-function splitRatio() {
-  const value = Number(localStorage.getItem(SPLIT_KEY));
-  if (!Number.isFinite(value)) return 0.5;
-  return Math.min(0.8, Math.max(0.2, value));
 }
 
 function mountSplit() {
@@ -161,8 +223,9 @@ function mountSplit() {
       preview.style.flex = "";
       return;
     }
-    const total = Math.max(content.clientWidth - handle.offsetWidth, MIN_PANE * 2);
-    const width = Math.min(total - MIN_PANE, Math.max(MIN_PANE, Math.round(total * splitRatio())));
+    const total = content.clientWidth - handle.offsetWidth;
+    if (total < MIN_PANE * 2) return;
+    const width = Math.min(total - MIN_PANE, Math.max(MIN_PANE, Math.round(total * splitRatioValue)));
     source.style.flex = `0 0 ${width}px`;
     source.style.width = `${width}px`;
     preview.style.flex = "1 1 auto";
@@ -172,8 +235,7 @@ function mountSplit() {
   const remember = () => {
     const total = content.clientWidth - handle.offsetWidth;
     if (total <= 0) return;
-    const ratio = source.getBoundingClientRect().width / total;
-    localStorage.setItem(SPLIT_KEY, String(Math.min(0.8, Math.max(0.2, ratio))));
+    splitRatioValue = Math.min(0.8, Math.max(0.2, source.getBoundingClientRect().width / total));
     apply();
   };
 
@@ -211,7 +273,7 @@ function mountSplit() {
     if (total <= 0) return;
     const current = source.getBoundingClientRect().width / total;
     const delta = event.key === "ArrowRight" ? 0.04 : -0.04;
-    localStorage.setItem(SPLIT_KEY, String(Math.min(0.8, Math.max(0.2, current + delta))));
+    splitRatioValue = Math.min(0.8, Math.max(0.2, current + delta));
     apply();
   });
 
@@ -220,6 +282,7 @@ function mountSplit() {
   observer.observe(preview, { attributes: true, attributeFilter: ["style"] });
   applySplit = apply;
   apply();
+  requestAnimationFrame(apply);
 }
 
 function pastePlainText(event) {
@@ -325,22 +388,23 @@ settingsToggle.addEventListener("click", () => {
   setSettingsOpen(settingsPanel.hidden);
 });
 
-[titleInput, categoryInput, customCategory, dateInput, slugInput, excerptInput].forEach((node) => {
+postsToggle.addEventListener("click", () => {
+  const open = postsPanel.hidden;
+  if (open) setSettingsOpen(false);
+  setPostsOpen(open);
+  if (open) loadPostList();
+  requestAnimationFrame(resizeEditor);
+});
+
+[titleInput, tagsInput, dateInput, slugInput, excerptInput].forEach((node) => {
   node.addEventListener("input", () => {
-    syncCategoryField();
     updateSlugHint();
     saveDraft();
   });
 });
 
-categoryInput.addEventListener("change", () => {
-  syncCategoryField();
-  if (categoryInput.value === "Other") setSettingsOpen(true);
-  updateSlugHint();
-  saveDraft();
-});
-
 publishButton.addEventListener("click", async () => {
+  if (working) return;
   if (!editorReady) {
     setStatus("The editor is still loading", true);
     return;
@@ -362,25 +426,25 @@ publishButton.addEventListener("click", async () => {
     return;
   }
   if (tokenInput.value.trim()) localStorage.setItem(TOKEN_KEY, tokenInput.value.trim());
-  publishButton.disabled = true;
+  const confirmed = window.confirm(`Publish "${draft.title.trim()}"?`);
+  if (!confirmed) return;
+  setWorking(true);
   setStatus("", false);
   try {
-    const post = await publishPost(token, draft, setStatus);
+    const published = await publishPost(token, draft, setStatus);
     localStorage.removeItem(DRAFT_KEY);
-    tokenInput.value = "";
-    refreshTokenState();
-    setStatus(`Published. /posts/${post.slug}.html should be up in a minute or two`, false);
+    window.location.assign(`${published.site.origin}/`);
+    return;
   } catch (error) {
     setStatus(error.message || "Publish failed", true);
   } finally {
-    publishButton.disabled = false;
+    setWorking(false);
   }
 });
 
 if (!dateInput.value) dateInput.value = today();
 if (!slugInput.value) slugInput.value = dateInput.value;
 loadDraft();
-syncCategoryField();
 refreshTokenState();
 updateSlugHint();
 createEditor();

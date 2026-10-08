@@ -22,27 +22,29 @@
       <input id="title" type="text" maxlength="80" placeholder="Title" autocomplete="off">
     </label>
     <label class="field compact">
-      <select id="category" aria-label="Category">
-        <option>Design</option>
-        <option>Writing</option>
-        <option>Daily</option>
-        <option>Other</option>
-      </select>
-    </label>
-    <label class="field compact">
       <input id="date" type="date" aria-label="Date">
     </label>
     <label class="field compact write-slug">
       <input id="slug" type="text" maxlength="60" spellcheck="false" placeholder="Filename" autocomplete="off" aria-label="Filename">
     </label>
     <button class="action" id="publish" type="button">Publish</button>
+    <button class="ghost" id="toggle-posts" type="button" aria-expanded="false" aria-controls="posts-panel">Posts</button>
     <button class="ghost" id="toggle-settings" type="button" aria-expanded="false" aria-controls="settings-panel">Token</button>
     <p class="status write-status" id="status" role="status"></p>
   </header>
 
+  <div class="write-meta">
+    <label class="field">
+      <input id="tags" type="text" maxlength="80" placeholder="Tags, separated by commas" aria-label="Tags" autocomplete="off">
+    </label>
+    <label class="field">
+      <input id="excerpt" type="text" maxlength="80" placeholder="Excerpt. Leave empty to use the first sentence" aria-label="Excerpt" autocomplete="off">
+    </label>
+  </div>
+
   <section class="write-settings" id="settings-panel" hidden>
-    <div>
-      <p>Use a fine-grained token that can only write to this repository. <a href="https://github.com/settings/personal-access-tokens/new">Create a token</a>, choose YCBGJS/YCBGJS.github.io, and set Contents to Read and write. The token stays in this browser.</p>
+    <p class="settings-note">Use your own fine-grained token. <a href="https://github.com/settings/personal-access-tokens/new">Create a token</a>, select only your username.github.io repository, and set Contents to Read and write. Publishing goes to that blog. The token stays in this browser.</p>
+    <div class="settings-line">
       <label class="field">
         <span>Token</span>
         <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
@@ -51,19 +53,16 @@
         <button class="ghost" id="save-token" type="button">Save token</button>
         <button class="ghost" id="clear-token" type="button">Clear</button>
       </div>
-      <p class="hint" id="token-state"></p>
     </div>
-    <div>
-      <label class="field" id="custom-wrap" hidden>
-        <span>Custom category</span>
-        <input id="category-custom" type="text" maxlength="12" placeholder="Notes">
-      </label>
-      <label class="field">
-        <span>Excerpt</span>
-        <input id="excerpt" type="text" maxlength="80" placeholder="Leave empty to use the first sentence">
-      </label>
+    <div class="settings-hints">
+      <p class="hint" id="token-state"></p>
       <p class="hint" id="slug-hint"></p>
     </div>
+  </section>
+
+  <section class="write-settings write-posts" id="posts-panel" hidden>
+    <p>Published posts. Deleting one removes it from the site.</p>
+    <ul class="post-admin" id="post-admin"></ul>
   </section>
 
   <main class="write-workspace">

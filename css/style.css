@@ -165,6 +165,10 @@ article {
 }
 
 .posts-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
   margin: auto;
   font-size: 0.8rem;
   text-align: center;
@@ -199,9 +203,14 @@ article {
   font-weight: 600;
 }
 
+.post-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .post-tags {
   display: inline;
-  margin-right: 6px;
   padding: 2px 5px;
   border: var(--text-color) 2px solid;
   border-radius: 5px;
@@ -376,7 +385,7 @@ article {
 .write-bar {
   display: grid;
   flex: none;
-  grid-template-columns: auto minmax(0, 1fr) 6.2rem 8.6rem minmax(5.5rem, 8rem) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) 8.6rem minmax(5.5rem, 8rem) auto auto auto;
   align-items: center;
   gap: 8px;
   min-height: 35px;
@@ -405,33 +414,130 @@ article {
 }
 
 .write-bar .field input,
-.write-bar .field select {
+.write-bar .field select,
+.write-meta .field input {
   width: 100%;
   min-width: 0;
   max-width: 100%;
 }
 
-.write-settings {
+.write-meta {
   display: grid;
   flex: none;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 0.8rem 1.2rem;
-  padding: 0.75rem 0.9rem 0.9rem;
+  grid-template-columns: minmax(8rem, 0.8fr) minmax(0, 1.2fr);
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--toolbar-background-color);
+}
+
+.write-settings {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px 10px;
   background: var(--panel-background-color);
   border-bottom: 1px solid var(--border-color);
   color: var(--textarea-text-color);
 }
 
-.write-settings[hidden] {
+.settings-note {
+  margin: 0;
+  max-width: 70rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.settings-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-line .field {
+  flex: 1 1 16rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-line .editor-actions {
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.settings-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-hints .hint {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.write-settings[hidden],
+.write-posts[hidden] {
   display: none;
+}
+
+.write-posts {
+  display: block;
+  max-height: 16rem;
+  overflow: auto;
+}
+
+.post-admin {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post-admin li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+}
+
+.post-admin li span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.write-page .danger {
+  color: #cf222e;
+}
+
+.write-page .danger:hover {
+  color: #fff;
+  background: #cf222e;
+  border-color: #cf222e;
 }
 
 .write-settings p,
 .write-page .hint,
 .write-page .status {
-  margin: 0 0 0.7rem;
+  margin: 0;
   color: var(--toolbar-icon-color);
   font-size: 13px;
+  line-height: 1.5;
 }
 
 .write-settings a,
@@ -730,11 +836,22 @@ body.is-splitting * {
   .write-page .action:hover {
     color: #1d2125;
   }
+
+  .write-page .danger:hover {
+    color: #fff;
+  }
 }
 
 @media (max-width: 720px) {
-  .write-settings {
-    grid-template-columns: 1fr;
+  .settings-line,
+  .settings-hints {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-line .field,
+  .settings-line .editor-actions {
+    flex: 0 0 auto;
   }
 
   .write-bar {
@@ -744,6 +861,10 @@ body.is-splitting * {
   .write-bar .brand,
   .write-title {
     grid-column: 1 / -1;
+  }
+
+  .write-meta {
+    grid-template-columns: 1fr;
   }
 }
 
