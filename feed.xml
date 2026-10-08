@@ -6,13 +6,7 @@
     <description>YCBGJS</description>
     <language>en</language>
     <!-- posts:start -->
-    <item>
-      <title>test</title>
-      <link>https://ycbgjs.github.io/posts/2026-10-08.html</link>
-      <guid>https://ycbgjs.github.io/posts/2026-10-08.html</guid>
-      <pubDate>Thu, 08 Oct 2026 00:00:00 +0800</pubDate>
-      <description>知识库要同时管住三件事：文件归谁、以哪一版为准、回答能不能对回原文。下面按这个顺序写。库是容器…</description>
-    </item>
+
 <!-- posts:end -->
   </channel>
 </rss>
