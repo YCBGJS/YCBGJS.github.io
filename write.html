@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Write · YCBGJS</title>
   <meta name="description" content="Write a post in Markdown and publish it to the YCBGJS blog.">
   <meta name="robots" content="noindex">
@@ -21,28 +21,35 @@
     <label class="field write-title">
       <input id="title" type="text" maxlength="80" placeholder="Title" autocomplete="off">
     </label>
+    <button class="action" id="publish" type="button">Publish</button>
+    <button class="ghost write-desktop-only" id="toggle-posts" type="button" aria-expanded="false" aria-controls="posts-panel">Posts</button>
+    <button class="ghost write-desktop-only" id="toggle-settings" type="button" aria-expanded="false" aria-controls="settings-panel">Token</button>
+    <p class="status write-status" id="status" role="status"></p>
+  </header>
+
+  <div class="write-stage">
+  <div class="write-meta" id="write-meta">
     <label class="field compact">
       <input id="date" type="date" aria-label="Date">
     </label>
     <label class="field compact write-slug">
       <input id="slug" type="text" maxlength="60" spellcheck="false" placeholder="Filename" autocomplete="off" aria-label="Filename">
     </label>
-    <button class="action" id="publish" type="button">Publish</button>
-    <button class="ghost" id="toggle-posts" type="button" aria-expanded="false" aria-controls="posts-panel">Posts</button>
-    <button class="ghost" id="toggle-settings" type="button" aria-expanded="false" aria-controls="settings-panel">Token</button>
-    <p class="status write-status" id="status" role="status"></p>
-  </header>
-
-  <div class="write-meta">
     <label class="field">
       <input id="tags" type="text" maxlength="80" placeholder="Tags, separated by commas" aria-label="Tags" autocomplete="off">
     </label>
     <label class="field">
       <input id="excerpt" type="text" maxlength="80" placeholder="Excerpt. Leave empty to use the first sentence" aria-label="Excerpt" autocomplete="off">
     </label>
+    <div class="write-meta-actions">
+      <button class="ghost" id="open-token" type="button" aria-expanded="false" aria-controls="settings-panel">Token</button>
+    </div>
   </div>
 
   <section class="write-settings" id="settings-panel" hidden>
+    <div class="write-sheet-close">
+      <button class="ghost" id="close-settings" type="button">Close</button>
+    </div>
     <p class="settings-note">Use your own fine-grained token. <a href="https://github.com/settings/personal-access-tokens/new">Create a token</a>, select only your username.github.io repository, and set Contents to Read and write. Publishing goes to that blog. The token stays in this browser.</p>
     <div class="settings-line">
       <label class="field">
@@ -68,6 +75,16 @@
   <main class="write-workspace">
     <div id="vditor"></div>
   </main>
+  </div>
+
+  <nav class="write-mobile-bar" aria-label="Editor">
+    <button class="ghost" id="toggle-details" type="button" aria-expanded="false" aria-controls="write-meta">Details</button>
+    <div class="write-mode" role="tablist" aria-label="Editor mode">
+      <button id="mode-edit" type="button" role="tab" aria-selected="true">Write</button>
+      <button id="mode-preview" type="button" role="tab" aria-selected="false">Preview</button>
+    </div>
+    <button class="ghost" id="toggle-posts-mobile" type="button" aria-expanded="false" aria-controls="posts-panel">Posts</button>
+  </nav>
   <script src="/vendor/vditor/dist/index.min.js"></script>
   <script type="module" src="/js/editor.js"></script>
 </body>

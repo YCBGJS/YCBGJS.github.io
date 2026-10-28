@@ -9,7 +9,6 @@ const MIN_PANE = 180;
 const tokenInput = document.querySelector("#token");
 const tokenState = document.querySelector("#token-state");
 const settingsPanel = document.querySelector("#settings-panel");
-const settingsToggle = document.querySelector("#toggle-settings");
 const titleInput = document.querySelector("#title");
 const tagsInput = document.querySelector("#tags");
 const dateInput = document.querySelector("#date");
@@ -22,6 +21,10 @@ const postsPanel = document.querySelector("#posts-panel");
 const postsToggle = document.querySelector("#toggle-posts");
 const postAdmin = document.querySelector("#post-admin");
 const workspace = document.querySelector(".write-workspace");
+const detailsToggle = document.querySelector("#toggle-details");
+const editModeButton = document.querySelector("#mode-edit");
+const previewModeButton = document.querySelector("#mode-preview");
+const mobileQuery = window.matchMedia("(max-width: 720px)");
 
 let vditor = null;
 let editorReady = false;
@@ -29,6 +32,7 @@ let working = false;
 let initialMarkdown = "";
 let applySplit = () => {};
 let splitRatioValue = 0.5;
+let mobileView = "edit";
 
 function today() {
   const now = new Date();
@@ -89,22 +93,52 @@ function loadDraft() {
   }
 }
 
+function isMobileWrite() {
+  return mobileQuery.matches;
+}
+
+function setExpanded(selector, open) {
+  document.querySelectorAll(selector).forEach((button) => {
+    button.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+}
+
+function setDetailsOpen(open) {
+  document.body.classList.toggle("is-details-open", open);
+  if (detailsToggle) detailsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function setMobileView(view) {
+  mobileView = view === "preview" ? "preview" : "edit";
+  const root = document.querySelector("#vditor");
+  if (root) root.classList.toggle("is-previewing", isMobileWrite() && mobileView === "preview");
+  if (editModeButton) editModeButton.setAttribute("aria-selected", mobileView === "edit" ? "true" : "false");
+  if (previewModeButton) previewModeButton.setAttribute("aria-selected", mobileView === "preview" ? "true" : "false");
+}
+
+function closeSheets() {
+  setDetailsOpen(false);
+  setPostsOpen(false);
+  setSettingsOpen(false);
+}
+
 function setSettingsOpen(open) {
   settingsPanel.hidden = !open;
-  settingsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  setExpanded("[aria-controls='settings-panel']", open);
   if (open) setPostsOpen(false);
   requestAnimationFrame(resizeEditor);
 }
 
 function setPostsOpen(open) {
   postsPanel.hidden = !open;
-  postsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  setExpanded("[aria-controls='posts-panel']", open);
 }
 
 function setWorking(value) {
   working = value;
   publishButton.disabled = value || !editorReady;
   postsToggle.disabled = value;
+  document.querySelector("#toggle-posts-mobile").disabled = value;
   postAdmin.querySelectorAll("button").forEach((button) => {
     button.disabled = value;
   });
@@ -195,7 +229,43 @@ function resizeEditor() {
   const shell = root && root.querySelector(".vditor");
   if (root) root.style.height = `${height}px`;
   if (shell) shell.style.height = `${height}px`;
+  if (isMobileWrite()) {
+    const handle = document.querySelector(".write-split");
+    if (handle) handle.hidden = true;
+    return;
+  }
   applySplit();
+}
+
+function syncViewport() {
+  const page = document.body;
+  const viewport = window.visualViewport;
+  if (!viewport || !isMobileWrite()) {
+    const changed = Boolean(page.style.height || page.style.maxHeight || page.style.marginTop || page.classList.contains("is-keyboard-open"));
+    page.style.height = "";
+    page.style.maxHeight = "";
+    page.style.marginTop = "";
+    page.classList.remove("is-keyboard-open");
+    return changed;
+  }
+  const height = `${Math.round(viewport.height)}px`;
+  const offset = `${Math.round(viewport.offsetTop)}px`;
+  const keyboardOpen = window.innerHeight - viewport.height - viewport.offsetTop > 80;
+  const changed = page.style.height !== height
+    || page.style.maxHeight !== height
+    || page.style.marginTop !== offset
+    || page.classList.contains("is-keyboard-open") !== keyboardOpen;
+  page.style.height = height;
+  page.style.maxHeight = height;
+  page.style.marginTop = offset;
+  page.classList.toggle("is-keyboard-open", keyboardOpen);
+  return changed;
+}
+
+function onViewportChange() {
+  const changed = syncViewport();
+  if (editorReady) setMobileView(mobileView);
+  if (changed) requestAnimationFrame(resizeEditor);
 }
 
 function mountSplit() {
@@ -215,6 +285,10 @@ function mountSplit() {
 
   const apply = () => {
     if (dragging) return;
+    if (isMobileWrite()) {
+      handle.hidden = true;
+      return;
+    }
     const both = source.style.display !== "none" && preview.style.display !== "none";
     handle.hidden = !both;
     if (!both) {
@@ -360,7 +434,8 @@ function createEditor() {
       const source = document.querySelector("#vditor textarea");
       if (source) source.addEventListener("paste", pastePlainText, true);
       mountSplit();
-      vditor.focus();
+      setMobileView(mobileView);
+      if (!isMobileWrite()) vditor.focus();
     },
   });
 }
@@ -377,6 +452,10 @@ document.querySelector("#save-token").addEventListener("click", () => {
   setStatus("Token saved in this browser", false);
 });
 
+document.querySelector("#close-settings").addEventListener("click", () => {
+  setSettingsOpen(false);
+});
+
 document.querySelector("#clear-token").addEventListener("click", () => {
   localStorage.removeItem(TOKEN_KEY);
   tokenInput.value = "";
@@ -384,16 +463,42 @@ document.querySelector("#clear-token").addEventListener("click", () => {
   setStatus("Token cleared", false);
 });
 
-settingsToggle.addEventListener("click", () => {
-  setSettingsOpen(settingsPanel.hidden);
+document.querySelectorAll("#toggle-settings, #open-token").forEach((button) => {
+  button.addEventListener("click", () => {
+    const open = settingsPanel.hidden;
+    if (open) setPostsOpen(false);
+    setSettingsOpen(open);
+  });
 });
 
-postsToggle.addEventListener("click", () => {
-  const open = postsPanel.hidden;
-  if (open) setSettingsOpen(false);
-  setPostsOpen(open);
-  if (open) loadPostList();
-  requestAnimationFrame(resizeEditor);
+document.querySelectorAll("#toggle-posts, #toggle-posts-mobile").forEach((button) => {
+  button.addEventListener("click", () => {
+    const open = postsPanel.hidden;
+    if (open) {
+      setSettingsOpen(false);
+      setDetailsOpen(false);
+    }
+    setPostsOpen(open);
+    if (open) loadPostList();
+    requestAnimationFrame(resizeEditor);
+  });
+});
+
+detailsToggle.addEventListener("click", () => {
+  const open = !document.body.classList.contains("is-details-open");
+  if (open) setPostsOpen(false);
+  setSettingsOpen(false);
+  setDetailsOpen(open);
+});
+
+editModeButton.addEventListener("click", () => {
+  closeSheets();
+  setMobileView("edit");
+});
+
+previewModeButton.addEventListener("click", () => {
+  closeSheets();
+  setMobileView("preview");
 });
 
 [titleInput, tagsInput, dateInput, slugInput, excerptInput].forEach((node) => {
@@ -447,9 +552,15 @@ if (!slugInput.value) slugInput.value = dateInput.value;
 loadDraft();
 refreshTokenState();
 updateSlugHint();
+syncViewport();
 createEditor();
 
-window.addEventListener("resize", resizeEditor);
+window.addEventListener("resize", onViewportChange);
+mobileQuery.addEventListener("change", onViewportChange);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", onViewportChange);
+  window.visualViewport.addEventListener("scroll", onViewportChange);
+}
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
 if (window.ResizeObserver) {
   new ResizeObserver(resizeEditor).observe(workspace);
